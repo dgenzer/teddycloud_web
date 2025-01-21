@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { Button, Card, Divider, Form, Input, Modal, Tooltip, Typography, theme } from "antd";
 import {
     CloseOutlined,
@@ -46,6 +47,7 @@ export const TonieCard: React.FC<{
 }> = ({ tonieCard, lastRUIDs, overlay, readOnly, defaultLanguage = "", showSourceInfo = true, onHide, onUpdate }) => {
     const { t } = useTranslation();
     const { token } = useToken();
+    const navigate = useNavigate();
     const { addNotification, addLoadingNotification, closeLoadingNotification } = useTeddyCloud();
     const [keyInfoModal, setKeyInfoModal] = useState(0);
     const [keyRadioStreamSearch, setKeyRadioStreamSearch] = useState(0);
@@ -110,7 +112,7 @@ export const TonieCard: React.FC<{
     const sourceTitle =
         "sourceInfo" in localTonieCard
             ? `${localTonieCard.sourceInfo.series}` +
-              (localTonieCard.sourceInfo.episode ? ` - ${localTonieCard.sourceInfo.episode}` : "")
+            (localTonieCard.sourceInfo.episode ? ` - ${localTonieCard.sourceInfo.episode}` : "")
             : "";
 
     const showSourceInfoPicture =
@@ -562,72 +564,72 @@ export const TonieCard: React.FC<{
 
     const actions = readOnly
         ? [
-              <InfoCircleOutlined
-                  key="info"
-                  onClick={() => {
-                      setKeyInfoModal(keyInfoModal + 1);
-                      setInformationModalOpen(true);
-                  }}
-              />,
-              localTonieCard.valid || activeSource.startsWith("http") ? (
-                  <PlayCircleOutlined
-                      key="playpause"
-                      onClick={() =>
-                          handlePlayPauseClick(
-                              localTonieCard.valid
-                                  ? import.meta.env.VITE_APP_TEDDYCLOUD_API_URL + localTonieCard.audioUrl
-                                  : activeSource
-                          )
-                      }
-                  />
-              ) : (
-                  <PlayCircleOutlined key="playpause" style={{ cursor: "default", color: token.colorTextDisabled }} />
-              ),
-              <CloudSyncOutlined
-                  key="nocloud"
-                  style={{ cursor: "default", color: isNoCloud ? "red" : token.colorTextDisabled }}
-              />,
-              <RetweetOutlined
-                  key="live"
-                  style={{ cursor: "default", color: isLive ? "red" : token.colorTextDisabled }}
-              />,
-          ]
+            <InfoCircleOutlined
+                key="info"
+                onClick={() => {
+                    setKeyInfoModal(keyInfoModal + 1);
+                    setInformationModalOpen(true);
+                }}
+            />,
+            localTonieCard.valid || activeSource.startsWith("http") ? (
+                <PlayCircleOutlined
+                    key="playpause"
+                    onClick={() =>
+                        handlePlayPauseClick(
+                            localTonieCard.valid
+                                ? import.meta.env.VITE_APP_TEDDYCLOUD_API_URL + localTonieCard.audioUrl
+                                : activeSource
+                        )
+                    }
+                />
+            ) : (
+                <PlayCircleOutlined key="playpause" style={{ cursor: "default", color: token.colorTextDisabled }} />
+            ),
+            <CloudSyncOutlined
+                key="nocloud"
+                style={{ cursor: "default", color: isNoCloud ? "red" : token.colorTextDisabled }}
+            />,
+            <RetweetOutlined
+                key="live"
+                style={{ cursor: "default", color: isLive ? "red" : token.colorTextDisabled }}
+            />,
+        ]
         : [
-              <InfoCircleOutlined
-                  key="info"
-                  onClick={() => {
-                      setKeyInfoModal(keyInfoModal + 1);
-                      setInformationModalOpen(true);
-                  }}
-              />,
-              <EditOutlined key="edit" onClick={showModelModal} />,
-              localTonieCard.valid || activeSource.startsWith("http") ? (
-                  <PlayCircleOutlined
-                      key="playpause"
-                      onClick={() =>
-                          handlePlayPauseClick(
-                              localTonieCard.valid
-                                  ? import.meta.env.VITE_APP_TEDDYCLOUD_API_URL + localTonieCard.audioUrl
-                                  : activeSource
-                          )
-                      }
-                  />
-              ) : downloadTriggerUrl && downloadTriggerUrl.length > 0 ? (
-                  <DownloadOutlined key="download" onClick={handleBackgroundDownload} />
-              ) : (
-                  <PlayCircleOutlined key="playpause" style={{ cursor: "default", color: token.colorTextDisabled }} />
-              ),
-              <CloudSyncOutlined
-                  key="nocloud"
-                  style={{ color: isNoCloud ? "red" : token.colorTextDescription }}
-                  onClick={handleNoCloudClick}
-              />,
-              <RetweetOutlined
-                  key="live"
-                  style={{ color: isLive ? "red" : token.colorTextDescription }}
-                  onClick={handleLiveClick}
-              />,
-          ];
+            <InfoCircleOutlined
+                key="info"
+                onClick={() => {
+                    setKeyInfoModal(keyInfoModal + 1);
+                    setInformationModalOpen(true);
+                }}
+            />,
+            <EditOutlined key="edit" onClick={showModelModal} />,
+            localTonieCard.valid || activeSource.startsWith("http") ? (
+                <PlayCircleOutlined
+                    key="playpause"
+                    onClick={() =>
+                        handlePlayPauseClick(
+                            localTonieCard.valid
+                                ? import.meta.env.VITE_APP_TEDDYCLOUD_API_URL + localTonieCard.audioUrl
+                                : activeSource
+                        )
+                    }
+                />
+            ) : downloadTriggerUrl && downloadTriggerUrl.length > 0 ? (
+                <DownloadOutlined key="download" onClick={handleBackgroundDownload} />
+            ) : (
+                <PlayCircleOutlined key="playpause" style={{ cursor: "default", color: token.colorTextDisabled }} />
+            ),
+            <CloudSyncOutlined
+                key="nocloud"
+                style={{ color: isNoCloud ? "red" : token.colorTextDescription }}
+                onClick={handleNoCloudClick}
+            />,
+            <RetweetOutlined
+                key="live"
+                style={{ color: isLive ? "red" : token.colorTextDescription }}
+                onClick={handleLiveClick}
+            />,
+        ];
 
     return (
         <>
@@ -661,7 +663,9 @@ export const TonieCard: React.FC<{
                     </div>
                 }
                 cover={
-                    <div style={{ position: "relative" }}>
+                    <div style={{ position: "relative" }}
+                        onClick={() => navigate(`/tonies/${localTonieCard.ruid}`, { state: { tonieCard: localTonieCard } })}
+                    >
                         <img
                             alt={`${localTonieCard.tonieInfo.series} - ${localTonieCard.tonieInfo.episode}`}
                             src={
@@ -678,12 +682,12 @@ export const TonieCard: React.FC<{
                                 title={
                                     `${sourceTitle}`
                                         ? t("tonies.alternativeSource", {
-                                              originalTonie: '"' + modelTitle + '"',
-                                              assignedContent: '"' + sourceTitle + '"',
-                                          }).replace(' "" ', " ")
+                                            originalTonie: '"' + modelTitle + '"',
+                                            assignedContent: '"' + sourceTitle + '"',
+                                        }).replace(' "" ', " ")
                                         : t("tonies.alternativeSourceUnknown", {
-                                              originalTonie: '"' + modelTitle + '"',
-                                          }).replace(' "" ', " ")
+                                            originalTonie: '"' + modelTitle + '"',
+                                        }).replace(' "" ', " ")
                                 }
                                 placement="bottom"
                             >

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Breadcrumb, Flex, Layout, Menu, theme } from "antd";
 import Sider from "antd/es/layout/Sider";
 import Item from "antd/es/list/Item";
 import styled from "styled-components";
@@ -53,6 +53,12 @@ export const HiddenDesktop = styled.span`
 export const HiddenMobile = styled.span`
     @media (max-width: 767px) {
         display: none;
+    }
+`;
+
+export const ColumnOnMobile = styled(Flex)`
+    @media (max-width: 767px) {
+        flex-direction: column;
     }
 `;
 

@@ -42,6 +42,7 @@ import { detectColorScheme } from "./utils/browserUtils";
 import { TeddyCloudProvider } from "./TeddyCloudContext";
 import { NotificationsListPage } from "./pages/settings/NotificationsListPage";
 import { HowToGetSupportPage } from "./pages/community/HowToGetSupportPage";
+import { TonieDetailPage } from "./pages/tonies/TonieDetailPage";
 
 function App() {
     const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -122,6 +123,7 @@ function App() {
                                         <Route path="/tonies/library" element={<LibraryPage />} />
                                         <Route path="/tonies/encoder" element={<EncoderPage />} />
                                         <Route path="/tonies/tap" element={<TonieAudioPlaylistsPage />} />
+                                        <Route path="/tonies/:id" element={<TonieDetailPage />} />
                                         <Route path="/tonieboxes" element={<TonieboxesPage />} />
                                         <Route path="/tonieboxes/boxsetup" element={<BoxSetupPage />} />
                                         <Route
