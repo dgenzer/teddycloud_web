@@ -7,7 +7,7 @@ import { defaultAPIConfig } from "../../config/defaultApiConfig";
 import { TeddyCloudApi } from "../../api";
 
 import { Button, Card, Divider, Input, Flex, theme, Descriptions, Tabs } from "antd";
-import { CloudSyncOutlined, CheckCircleOutlined, DownloadOutlined, StopOutlined, PlayCircleOutlined, RetweetOutlined, RollbackOutlined, CloseOutlined, FolderOpenOutlined, WifiOutlined, SaveFilled } from "@ant-design/icons";
+import { CloudSyncOutlined, CheckCircleOutlined, DownloadOutlined, StopOutlined, PlayCircleOutlined, RetweetOutlined, RollbackOutlined, CloseOutlined, FolderOpenOutlined, WifiOutlined, SaveFilled, EditOutlined } from "@ant-design/icons";
 
 import BreadcrumbWrapper, { ColumnOnMobile, HiddenDesktop, HiddenMobile, StyledContent, StyledLayout, StyledSider } from "../../components/StyledComponents";
 import { ToniesSubNav } from "../../components/tonies/ToniesSubNav";
@@ -421,6 +421,12 @@ export const TonieDetailPage = () => {
 
     // -- MODEL
 
+    const [editMode, setEditMode] = useState(false);
+    const handleEditModeClick = () => {
+        setEditMode(!editMode);
+    }
+
+
 
     return (
         <>
@@ -454,7 +460,7 @@ export const TonieDetailPage = () => {
                             <HiddenDesktop>
                                 <Divider />
                             </HiddenDesktop>
-                            <div>
+                            <div style={{ minWidth: "30%" }}>
                                 {informationFromSource ? (
                                     tonie && sourceTracks && sourceTracks.length > 0 ? (
                                         <>
@@ -529,6 +535,12 @@ export const TonieDetailPage = () => {
                         </ColumnOnMobile>
                         <Divider />
                         <Flex gap="small" wrap>
+                            {editMode ?
+                                <Button key="editMode" onClick={handleEditModeClick} type="primary" icon={<EditOutlined />}></Button>
+                                :
+                                <Button key="editMode" onClick={handleEditModeClick} type="primary" ghost icon={<EditOutlined />}></Button>
+                            }
+
                             <Button
                                 key="nocloud"
                                 style={{ color: isNoCloud ? "red" : token.colorTextDescription }}
@@ -562,128 +574,131 @@ export const TonieDetailPage = () => {
                             }
                         </Flex>
 
-                        <Divider />
+                        {editMode && (<>
+                            <Divider />
 
-                        <Card title={t("tonies.selectFileModal.selectFile")} actions={[
-                            <Button
-                                type="primary"
-                                onClick={handleSourceSave}
-                                disabled={activeSource === selectedSource}
-                            >
-                                <SaveFilled key="saveClick" /> {t("tonies.editModal.save")}
-                            </Button>
-                        ]}>
-                            <Input
-                                key="source"
-                                value={selectedSource}
-                                width="auto"
-                                onChange={handleSourceInputChange}
-                                addonBefore={[
-                                    <CloseOutlined
-                                        key="close-source"
-                                        onClick={() => {
-                                            setSelectedSource("");
-                                            setInputValidationSource({ validateStatus: "", help: "" });
-                                        }}
-                                    />,
-                                    <Divider key="divider-source" type="vertical" style={{ height: 16 }} />,
-                                    <RollbackOutlined
-                                        key="rollback-source"
-                                        onClick={() => {
-                                            setSelectedSource(activeSource || "");
-                                            setTempSelectedSource(activeSource || "");
-                                            setInputValidationSource({ validateStatus: "", help: "" });
-                                        }}
-                                        style={{
-                                            color: activeSource === selectedSource ? token.colorTextDisabled : token.colorText,
-                                            cursor: activeSource === selectedSource ? "default" : "pointer",
-                                        }}
-                                    />,
-                                ]}
-                            />
+                            <Card title={t("tonies.selectFileModal.selectFile")} actions={[
+                                <Button
+                                    type="primary"
+                                    onClick={handleSourceSave}
+                                    disabled={activeSource === selectedSource}
+                                >
+                                    <SaveFilled key="saveClick" /> {t("tonies.editModal.save")}
+                                </Button>
+                            ]}>
+                                <Input
+                                    key="source"
+                                    value={selectedSource}
+                                    width="auto"
+                                    onChange={handleSourceInputChange}
+                                    addonBefore={[
+                                        <CloseOutlined
+                                            key="close-source"
+                                            onClick={() => {
+                                                setSelectedSource("");
+                                                setInputValidationSource({ validateStatus: "", help: "" });
+                                            }}
+                                        />,
+                                        <Divider key="divider-source" type="vertical" style={{ height: 16 }} />,
+                                        <RollbackOutlined
+                                            key="rollback-source"
+                                            onClick={() => {
+                                                setSelectedSource(activeSource || "");
+                                                setTempSelectedSource(activeSource || "");
+                                                setInputValidationSource({ validateStatus: "", help: "" });
+                                            }}
+                                            style={{
+                                                color: activeSource === selectedSource ? token.colorTextDisabled : token.colorText,
+                                                cursor: activeSource === selectedSource ? "default" : "pointer",
+                                            }}
+                                        />,
+                                    ]}
+                                />
+
+                                <Divider />
+
+                                {activeSource && <Tabs
+                                    defaultActiveKey={activeSource.startsWith("lib://") ? "file" : "radio"}
+                                    centered
+                                    items={[
+                                        {
+                                            key: "file",
+                                            label: "",
+                                            icon: <FolderOpenOutlined />,
+                                            children: [
+                                                <SelectFileFileBrowser
+                                                    key={keySelectFileFileBrowser}
+                                                    special="library"
+                                                    maxSelectedRows={1}
+                                                    trackUrl={false}
+                                                    filetypeFilter={[".taf", ".tap"]}
+                                                    onFileSelectChange={handleFileSelectChange}
+                                                />
+                                            ]
+                                        },
+                                        {
+                                            key: "radio",
+                                            label: "",
+                                            icon: <WifiOutlined />,
+                                            children: [
+                                                <RadioStreamSearch
+                                                    placeholder={t("tonies.editModal.placeholderSearchForARadioStream")}
+                                                    onChange={searchRadioResultChanged}
+                                                    key={keyRadioStreamSearch}
+                                                />
+                                            ]
+                                        }
+                                    ]}
+                                />}
+                            </Card>
 
                             <Divider />
-                            {activeSource && <Tabs
-                                defaultActiveKey={activeSource.startsWith("lib://") ? "file" : "radio"}
-                                centered
-                                items={[
-                                    {
-                                        key: "file",
-                                        label: "",
-                                        icon: <FolderOpenOutlined />,
-                                        children: [
-                                            <SelectFileFileBrowser
-                                                key={keySelectFileFileBrowser}
-                                                special="library"
-                                                maxSelectedRows={1}
-                                                trackUrl={false}
-                                                filetypeFilter={[".taf", ".tap"]}
-                                                onFileSelectChange={handleFileSelectChange}
-                                            />
-                                        ]
-                                    },
-                                    {
-                                        key: "radio",
-                                        label: "",
-                                        icon: <WifiOutlined />,
-                                        children: [
-                                            <RadioStreamSearch
-                                                placeholder={t("tonies.editModal.placeholderSearchForARadioStream")}
-                                                onChange={searchRadioResultChanged}
-                                                key={keyRadioStreamSearch}
-                                            />
-                                        ]
-                                    }
-                                ]}
-                            />}
 
-                        </Card>
+                            <Card title={t("tonies.editModal.title")} actions={[
+                                <Button
+                                    type="primary"
+                                    onClick={handleModelSave}
+                                    disabled={activeModel === selectedModel}
+                                >
+                                    <SaveFilled key="saveClick" /> {t("tonies.editModal.save")}
+                                </Button>
+                            ]}>
+                                <Input
+                                    key="model"
+                                    value={selectedModel}
+                                    width="auto"
+                                    onChange={handleModelInputChange}
+                                    addonBefore={[
+                                        <CloseOutlined
+                                            key="close-model"
+                                            onClick={() => {
+                                                setSelectedModel("");
+                                                setInputValidationModel({ validateStatus: "", help: "" });
+                                            }}
+                                        />,
+                                        <Divider key="divider-model" type="vertical" style={{ height: 16 }} />,
+                                        <RollbackOutlined
+                                            key="rollback-model"
+                                            onClick={() => {
+                                                setSelectedModel(activeModel || "");
+                                                setInputValidationModel({ validateStatus: "", help: "" });
+                                            }}
+                                            style={{
+                                                color: activeModel === selectedModel ? token.colorTextDisabled : token.colorText,
+                                                cursor: activeModel === selectedModel ? "default" : "pointer",
+                                            }}
+                                        />,
+                                    ]}
+                                />
+                                <TonieArticleSearch
+                                    placeholder={t("tonies.editModal.placeholderSearchForAModel")}
+                                    onChange={searchModelResultChanged}
+                                    key={keyTonieArticleSearch}
+                                />
 
-                        <Divider />
-
-                        <Card title={t("tonies.editModal.title")} actions={[
-                            <Button
-                                type="primary"
-                                onClick={handleModelSave}
-                                disabled={activeModel === selectedModel}
-                            >
-                                <SaveFilled key="saveClick" /> {t("tonies.editModal.save")}
-                            </Button>
-                        ]}>
-                            <Input
-                                key="model"
-                                value={selectedModel}
-                                width="auto"
-                                onChange={handleModelInputChange}
-                                addonBefore={[
-                                    <CloseOutlined
-                                        key="close-model"
-                                        onClick={() => {
-                                            setSelectedModel("");
-                                            setInputValidationModel({ validateStatus: "", help: "" });
-                                        }}
-                                    />,
-                                    <Divider key="divider-model" type="vertical" style={{ height: 16 }} />,
-                                    <RollbackOutlined
-                                        key="rollback-model"
-                                        onClick={() => {
-                                            setSelectedModel(activeModel || "");
-                                            setInputValidationModel({ validateStatus: "", help: "" });
-                                        }}
-                                        style={{
-                                            color: activeModel === selectedModel ? token.colorTextDisabled : token.colorText,
-                                            cursor: activeModel === selectedModel ? "default" : "pointer",
-                                        }}
-                                    />,
-                                ]}
-                            />
-                            <TonieArticleSearch
-                                placeholder={t("tonies.editModal.placeholderSearchForAModel")}
-                                onChange={searchModelResultChanged}
-                                key={keyTonieArticleSearch}
-                            />
-
-                        </Card>
+                            </Card>
+                        </>
+                        )}
 
                         <Divider />
                         <Descriptions bordered>
@@ -698,12 +713,6 @@ export const TonieDetailPage = () => {
                             <Descriptions.Item label="exists">
                                 {tonie?.exists ? (<CheckCircleOutlined style={{ color: token.colorSuccess }} />) : (<StopOutlined style={{ color: token.colorError }} />)}
                             </Descriptions.Item>
-                            <Descriptions.Item label="live">
-                                {tonie?.live ? (<CheckCircleOutlined style={{ color: token.colorSuccess }} />) : (<StopOutlined style={{ color: token.colorError }} />)}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="nocloud">
-                                {tonie?.nocloud ? (<CheckCircleOutlined style={{ color: token.colorSuccess }} />) : (<StopOutlined style={{ color: token.colorError }} />)}
-                            </Descriptions.Item>
                             <Descriptions.Item label="hasCloudAuth">
                                 {tonie?.hasCloudAuth ? (<CheckCircleOutlined style={{ color: token.colorSuccess }} />) : (<StopOutlined style={{ color: token.colorError }} />)}
                             </Descriptions.Item>
@@ -715,7 +724,7 @@ export const TonieDetailPage = () => {
                             </Descriptions.Item>
                         </Descriptions>
                     </div>
-                    {false ? (
+                    {loading ? (
                         <LoadingSpinner />
                     ) : (
                         ""
