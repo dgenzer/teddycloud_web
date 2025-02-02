@@ -243,7 +243,7 @@ export const IdentifyBoxVersionPage = () => {
                         </Button>
                         <Paragraph style={{ fontSize: "small", marginTop: 16 }}>
                             {t("tonieboxes.boxSetup.identifyVersion.macvendors")}{" "}
-                            <Link to="https://macvendors.com/" target="_blank">
+                            <Link to="https://mac-to-vendor-yps2oxobta-uc.a.run.app/" target="_blank">
                                 {t("tonieboxes.boxSetup.identifyVersion.macvendorsLink")}
                             </Link>
                         </Paragraph>
