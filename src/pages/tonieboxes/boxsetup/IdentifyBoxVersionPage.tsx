@@ -39,7 +39,7 @@ export const IdentifyBoxVersionPage = () => {
         setError(null);
 
         try {
-            const response = await fetch(`https://api.macvendors.com/${encodeURIComponent(boxMac)}`);
+            const response = await fetch(`https://mac-to-vendor-yps2oxobta-uc.a.run.app/${encodeURIComponent(boxMac)}`);
 
             if (!response.ok) {
                 throw new Error("MAC address not found or invalid");
